@@ -1,3 +1,5 @@
+import json
+
 _ATHENA_CLIENT = None
 
 def create_hive_table_with_athena(query):
@@ -23,3 +25,18 @@ def handler():
     Utilize a função create_hive_table_with_athena para te auxiliar
         na criação da tabela HIVE, não é necessário alterá-la
     '''
+
+    f = open(r'C:\Users\Gustavo\Desktop\desafio_tecnico\desafios\exercicio2\schema.json')
+    schema = json.load(f)
+    create = ''
+
+    # Loop para apendar junto à string do create os campos e tipos
+    for i in schema['properties']:
+                col_name = i
+                col_type = schema['properties'][i]['type']
+                create += f'{col_name} {col_type},\n'
+
+    # Definição do tamanho da string -2, para retirar a última vírgula e evitar erro de sintaxe durante create
+    exclude_comma = len(create)-2
+
+    create_table = (f'CREATE EXTERNAL TABLE IF NOT EXISTS db_schema.table_name({create[:exclude_comma]}) \nSTORED AS PARQUET\nLOCATION \'s3://iti-query-results/[folder]/\'')
